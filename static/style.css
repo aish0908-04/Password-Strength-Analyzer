@@ -1,0 +1,177 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #6b7280;
+}
+
+.password-box,
+.requirements,
+.suggestions {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+.input-container input {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+.input-container input:focus {
+    border-color: #2563eb;
+}
+
+.input-container button {
+    width: 55px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #e5e7eb;
+    font-size: 18px;
+}
+
+.strength-bar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+#strengthBar {
+    height: 100%;
+    width: 0%;
+    transition: 0.3s;
+}
+
+#strengthText {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.score {
+    text-align: center;
+    margin-top: 8px;
+    color: #555;
+}
+
+.requirements h2,
+.suggestions h2 {
+    margin-bottom: 15px;
+    color: #1f2937;
+}
+
+.requirement {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.requirement.valid {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.suggestions ul {
+    padding-left: 20px;
+}
+
+.suggestions li {
+    margin-bottom: 8px;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.generate-btn:hover {
+    background: #1d4ed8;
+}
+
+.generated {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.generated input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.generated button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #111827;
+    color: white;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+@media (max-width: 500px) {
+
+    .generated {
+        flex-direction: column;
+    }
+
+    .input-container {
+        gap: 5px;
+    }
+}
