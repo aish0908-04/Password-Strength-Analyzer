@@ -1,112 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Password Strength Analyzer</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="header">
-        <h1>🔐 Password Strength Analyzer</h1>
-        <p>Analyze your password and improve its security</p>
-    </div>
+    <header>
 
-    <div class="password-box">
+        <div class="lock">🔐</div>
 
-        <div class="input-container">
-            <input 
-                type="password" 
-                id="password"
-                placeholder="Enter your password"
-                autocomplete="new-password"
-            >
+        <h1>Password Strength Analyzer</h1>
 
-            <button id="togglePassword" type="button">
-                👁
+        <p>
+            Cybersecurity tool for analyzing password security
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <!-- Password Input -->
+
+        <section class="card">
+
+            <h2>Analyze Password</h2>
+
+            <div class="input-box">
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    autocomplete="new-password"
+                >
+
+                <button
+                    id="togglePassword"
+                    type="button">
+                    👁
+                </button>
+
+            </div>
+
+
+            <!-- Strength Bar -->
+
+            <div class="strength-container">
+
+                <div class="strength-bar">
+
+                    <div id="strengthBar"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="strength-result">
+
+                <h2 id="strengthText">
+                    Enter a password
+                </h2>
+
+                <p>
+                    Security Score:
+                    <strong>
+                        <span id="score">0</span>/100
+                    </strong>
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Requirements -->
+
+        <section class="card">
+
+            <h2>Password Requirements</h2>
+
+            <div id="requirements">
+
+                <div id="length">
+                    ❌ At least 12 characters
+                </div>
+
+                <div id="uppercase">
+                    ❌ Uppercase letter
+                </div>
+
+                <div id="lowercase">
+                    ❌ Lowercase letter
+                </div>
+
+                <div id="number">
+                    ❌ Number
+                </div>
+
+                <div id="special">
+                    ❌ Special character
+                </div>
+
+                <div id="unique">
+                    ❌ Character variety
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Suggestions -->
+
+        <section class="card">
+
+            <h2>💡 Security Recommendations</h2>
+
+            <ul id="suggestions">
+
+                <li>
+                    Use at least 12 characters.
+                </li>
+
+                <li>
+                    Avoid reusing passwords.
+                </li>
+
+                <li>
+                    Avoid personal information.
+                </li>
+
+            </ul>
+
+        </section>
+
+
+        <!-- Password History -->
+
+        <section class="card">
+
+            <h2>🔒 Password History</h2>
+
+            <p id="reuseStatus">
+                Password reuse status will appear here.
+            </p>
+
+            <button
+                class="save-btn"
+                id="savePassword">
+
+                Save Password Hash
+
             </button>
-        </div>
 
-        <div class="strength-bar">
-            <div id="strengthBar"></div>
-        </div>
+        </section>
 
-        <h2 id="strengthText">Enter a password</h2>
 
-        <div class="score">
-            Score: <span id="score">0</span>/100
-        </div>
+        <!-- Generator -->
 
-    </div>
+        <section class="card">
 
-    <div class="requirements">
+            <h2>🔑 Strong Password Generator</h2>
 
-        <h2>Password Requirements</h2>
+            <div class="generated-box">
 
-        <div class="requirement" id="length">
-            ❌ At least 12 characters
-        </div>
+                <input
+                    type="text"
+                    id="generatedPassword"
+                    readonly
+                    placeholder="Generated password"
+                >
 
-        <div class="requirement" id="uppercase">
-            ❌ Contains uppercase letter
-        </div>
+                <button id="generatePassword">
+                    Generate
+                </button>
 
-        <div class="requirement" id="lowercase">
-            ❌ Contains lowercase letter
-        </div>
+                <button id="copyPassword">
+                    Copy
+                </button>
 
-        <div class="requirement" id="number">
-            ❌ Contains a number
-        </div>
+            </div>
 
-        <div class="requirement" id="special">
-            ❌ Contains special character
-        </div>
+        </section>
 
-        <div class="requirement" id="unique">
-            ❌ Good character variety
-        </div>
+    </main>
 
-    </div>
-
-    <div class="suggestions">
-
-        <h2>💡 Security Suggestions</h2>
-
-        <ul id="suggestionList">
-            <li>Use a long and unique password.</li>
-            <li>Avoid using personal information.</li>
-            <li>Do not reuse passwords across websites.</li>
-        </ul>
-
-    </div>
-
-    <button class="generate-btn" id="generatePassword">
-        🔑 Generate Strong Password
-    </button>
-
-    <div class="generated">
-        <input 
-            type="text" 
-            id="generatedPassword"
-            readonly
-            placeholder="Generated password will appear here"
-        >
-
-        <button id="copyPassword">Copy</button>
-    </div>
 
     <footer>
-        <p>Cyber Security Project | Password Strength Analyzer</p>
+
+        <p>
+            Password Strength Analyzer |
+            Cyber Security Project
+        </p>
+
     </footer>
 
 </div>
 
-<script src="script.js"></script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
+
 </html>

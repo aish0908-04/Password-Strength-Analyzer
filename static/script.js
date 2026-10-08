@@ -1,207 +1,194 @@
-const passwordInput = document.getElementById("password");
-const strengthBar = document.getElementById("strengthBar");
-const strengthText = document.getElementById("strengthText");
-const scoreDisplay = document.getElementById("score");
+const passwordInput =
+    document.getElementById("password");
 
-const commonPasswords = [
-    "password",
-    "password123",
-    "123456",
-    "12345678",
-    "123456789",
-    "qwerty",
-    "qwerty123",
-    "admin",
-    "admin123",
-    "welcome",
-    "letmein",
-    "iloveyou"
-];
+const strengthBar =
+    document.getElementById("strengthBar");
 
-passwordInput.addEventListener("input", analyzePassword);
+const strengthText =
+    document.getElementById("strengthText");
 
-function analyzePassword() {
+const scoreDisplay =
+    document.getElementById("score");
+
+const reuseStatus =
+    document.getElementById("reuseStatus");
+
+
+// -------------------------
+// Analyze Password
+// -------------------------
+
+passwordInput.addEventListener(
+    "input",
+    analyzePassword
+);
+
+
+async function analyzePassword() {
 
     const password = passwordInput.value;
 
-    let score = 0;
-    let suggestions = [];
+    if (!password) {
 
-    const hasLength = password.length >= 12;
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+        resetAnalyzer();
 
-    const uniqueCharacters =
-        new Set(password).size >= Math.min(8, password.length);
-
-    const isCommon =
-        commonPasswords.includes(password.toLowerCase());
-
-    // Length
-    if (password.length >= 8) {
-        score += 15;
+        return;
     }
 
-    if (password.length >= 12) {
-        score += 20;
-    }
+    try {
 
-    if (password.length >= 16) {
-        score += 10;
-    }
+        const response = await fetch(
+            "/analyze",
+            {
+                method: "POST",
 
-    // Complexity
-    if (hasUppercase) {
-        score += 10;
-    }
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-    if (hasLowercase) {
-        score += 10;
-    }
-
-    if (hasNumber) {
-        score += 10;
-    }
-
-    if (hasSpecial) {
-        score += 15;
-    }
-
-    // Character variety
-    if (uniqueCharacters) {
-        score += 10;
-    }
-
-    // Common password penalty
-    if (isCommon) {
-        score -= 50;
-        suggestions.push(
-            "Avoid common passwords such as password123 or 123456."
+                body: JSON.stringify({
+                    password: password
+                })
+            }
         );
+
+        const data = await response.json();
+
+        displayResult(data);
+
+    } catch (error) {
+
+        console.error(error);
+
     }
-
-    // Repeated characters
-    if (/(.)\1\1/.test(password)) {
-        score -= 10;
-        suggestions.push(
-            "Avoid using the same character repeatedly."
-        );
-    }
-
-    score = Math.max(0, Math.min(score, 100));
-
-    updateRequirement("length", hasLength);
-    updateRequirement("uppercase", hasUppercase);
-    updateRequirement("lowercase", hasLowercase);
-    updateRequirement("number", hasNumber);
-    updateRequirement("special", hasSpecial);
-    updateRequirement("unique", uniqueCharacters);
-
-    if (password.length < 12) {
-        suggestions.push(
-            "Use at least 12 characters."
-        );
-    }
-
-    if (!hasUppercase) {
-        suggestions.push(
-            "Add uppercase letters."
-        );
-    }
-
-    if (!hasLowercase) {
-        suggestions.push(
-            "Add lowercase letters."
-        );
-    }
-
-    if (!hasNumber) {
-        suggestions.push(
-            "Add numbers."
-        );
-    }
-
-    if (!hasSpecial) {
-        suggestions.push(
-            "Add special characters such as !, @, # or $."
-        );
-    }
-
-    if (uniqueCharacters === false && password.length > 0) {
-        suggestions.push(
-            "Use more unique characters."
-        );
-    }
-
-    updateStrength(score, password);
-
-    displaySuggestions(suggestions);
 }
 
 
-function updateRequirement(id, valid) {
+// -------------------------
+// Display Results
+// -------------------------
 
-    const element = document.getElementById(id);
+function displayResult(data) {
+
+    scoreDisplay.textContent =
+        data.score;
+
+    strengthText.textContent =
+        data.strength;
+
+    strengthBar.style.width =
+        data.score + "%";
+
+
+    updateRequirement(
+        "length",
+        data.length >= 12,
+        "At least 12 characters"
+    );
+
+    updateRequirement(
+        "uppercase",
+        data.uppercase,
+        "Uppercase letter"
+    );
+
+    updateRequirement(
+        "lowercase",
+        data.lowercase,
+        "Lowercase letter"
+    );
+
+    updateRequirement(
+        "number",
+        data.number,
+        "Number"
+    );
+
+    updateRequirement(
+        "special",
+        data.special,
+        "Special character"
+    );
+
+    updateRequirement(
+        "unique",
+        data.unique,
+        "Character variety"
+    );
+
+
+    displaySuggestions(
+        data.suggestions
+    );
+
+
+    if (data.reused) {
+
+        reuseStatus.textContent =
+            "⚠️ This password exists in your password history.";
+
+    } else {
+
+        reuseStatus.textContent =
+            "✅ This password has not been found in your local password history.";
+
+    }
+}
+
+
+// -------------------------
+// Requirement UI
+// -------------------------
+
+function updateRequirement(
+    id,
+    valid,
+    text
+) {
+
+    const element =
+        document.getElementById(id);
 
     if (valid) {
+
         element.classList.add("valid");
+
         element.textContent =
-            "✅ " + element.textContent.substring(2);
+            "✅ " + text;
+
     } else {
+
         element.classList.remove("valid");
 
-        if (element.textContent.startsWith("✅")) {
-            element.textContent =
-                "❌ " + element.textContent.substring(2);
-        }
+        element.textContent =
+            "❌ " + text;
     }
 }
 
 
-function updateStrength(score, password) {
+// -------------------------
+// Suggestions
+// -------------------------
 
-    scoreDisplay.textContent = score;
+function displaySuggestions(
+    suggestions
+) {
 
-    strengthBar.style.width = score + "%";
-
-    if (password.length === 0) {
-
-        strengthText.textContent = "Enter a password";
-
-    } else if (score < 30) {
-
-        strengthText.textContent = "Very Weak";
-
-    } else if (score < 50) {
-
-        strengthText.textContent = "Weak";
-
-    } else if (score < 70) {
-
-        strengthText.textContent = "Moderate";
-
-    } else if (score < 90) {
-
-        strengthText.textContent = "Strong";
-
-    } else {
-
-        strengthText.textContent = "Very Strong";
-    }
-}
-
-
-function displaySuggestions(suggestions) {
-
-    const list = document.getElementById("suggestionList");
+    const list =
+        document.getElementById(
+            "suggestions"
+        );
 
     list.innerHTML = "";
 
-    if (suggestions.length === 0) {
+    if (
+        !suggestions ||
+        suggestions.length === 0
+    ) {
 
-        const li = document.createElement("li");
+        const li =
+            document.createElement("li");
 
         li.textContent =
             "Excellent! Your password meets the recommended requirements.";
@@ -211,124 +198,250 @@ function displaySuggestions(suggestions) {
         return;
     }
 
-    suggestions.forEach(function(suggestion) {
 
-        const li = document.createElement("li");
+    suggestions.forEach(
+        function (suggestion) {
 
-        li.textContent = suggestion;
+            const li =
+                document.createElement("li");
 
-        list.appendChild(li);
+            li.textContent =
+                suggestion;
 
-    });
+            list.appendChild(li);
+
+        }
+    );
 }
 
 
+// -------------------------
 // Show / Hide Password
+// -------------------------
 
 document
     .getElementById("togglePassword")
-    .addEventListener("click", function() {
+    .addEventListener(
+        "click",
+        function () {
 
-        if (passwordInput.type === "password") {
+            if (
+                passwordInput.type ===
+                "password"
+            ) {
 
-            passwordInput.type = "text";
-            this.textContent = "🙈";
+                passwordInput.type =
+                    "text";
 
-        } else {
+                this.textContent =
+                    "🙈";
 
-            passwordInput.type = "password";
-            this.textContent = "👁";
+            } else {
+
+                passwordInput.type =
+                    "password";
+
+                this.textContent =
+                    "👁";
+            }
         }
+    );
 
-    });
 
-
-// Generate Strong Password
+// -------------------------
+// Generate Password
+// -------------------------
 
 document
-    .getElementById("generatePassword")
-    .addEventListener("click", function() {
-
-        const generated = generateStrongPassword(18);
-
-        document.getElementById("generatedPassword").value =
-            generated;
-
-    });
+    .getElementById(
+        "generatePassword"
+    )
+    .addEventListener(
+        "click",
+        generatePassword
+    );
 
 
-function generateStrongPassword(length) {
+async function generatePassword() {
 
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const numbers = "0123456789";
-    const special = "!@#$%^&*()-_=+";
+    try {
 
-    const all =
-        uppercase +
-        lowercase +
-        numbers +
-        special;
+        const response =
+            await fetch("/generate");
 
-    let password = "";
+        const data =
+            await response.json();
 
-    // Ensure complexity requirements
+        document
+            .getElementById(
+                "generatedPassword"
+            )
+            .value =
+            data.password;
 
-    password += randomCharacter(uppercase);
-    password += randomCharacter(lowercase);
-    password += randomCharacter(numbers);
-    password += randomCharacter(special);
+    } catch (error) {
 
-    for (let i = password.length; i < length; i++) {
-
-        password += randomCharacter(all);
+        console.error(error);
 
     }
-
-    return shuffle(password);
 }
 
 
-function randomCharacter(characters) {
-
-    const index =
-        Math.floor(Math.random() * characters.length);
-
-    return characters[index];
-}
-
-
-function shuffle(string) {
-
-    return string
-        .split("")
-        .sort(() => Math.random() - 0.5)
-        .join("");
-}
-
-
-// Copy Generated Password
+// -------------------------
+// Copy Password
+// -------------------------
 
 document
     .getElementById("copyPassword")
-    .addEventListener("click", async function() {
+    .addEventListener(
+        "click",
+        async function () {
 
-        const generated =
-            document.getElementById("generatedPassword").value;
+            const password =
+                document.getElementById(
+                    "generatedPassword"
+                ).value;
 
-        if (!generated) {
-            alert("Generate a password first.");
-            return;
+            if (!password) {
+
+                alert(
+                    "Generate a password first."
+                );
+
+                return;
+            }
+
+            await navigator.clipboard
+                .writeText(password);
+
+            this.textContent =
+                "Copied!";
+
+            setTimeout(
+                () => {
+
+                    this.textContent =
+                        "Copy";
+
+                },
+                1500
+            );
         }
+    );
 
-        await navigator.clipboard.writeText(generated);
 
-        this.textContent = "Copied!";
+// -------------------------
+// Save Password Hash
+// -------------------------
 
-        setTimeout(() => {
+document
+    .getElementById("savePassword")
+    .addEventListener(
+        "click",
+        savePassword
+    );
 
-            this.textContent = "Copy";
 
-        }, 1500);
+async function savePassword() {
 
-    });
+    const password =
+        passwordInput.value;
+
+    if (!password) {
+
+        alert(
+            "Enter a password first."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/save-password",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        password: password
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+
+        reuseStatus.textContent =
+            data.message;
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+}
+
+
+// -------------------------
+// Reset
+// -------------------------
+
+function resetAnalyzer() {
+
+    scoreDisplay.textContent = "0";
+
+    strengthText.textContent =
+        "Enter a password";
+
+    strengthBar.style.width =
+        "0%";
+
+    reuseStatus.textContent =
+        "Password reuse status will appear here.";
+
+
+    updateRequirement(
+        "length",
+        false,
+        "At least 12 characters"
+    );
+
+    updateRequirement(
+        "uppercase",
+        false,
+        "Uppercase letter"
+    );
+
+    updateRequirement(
+        "lowercase",
+        false,
+        "Lowercase letter"
+    );
+
+    updateRequirement(
+        "number",
+        false,
+        "Number"
+    );
+
+    updateRequirement(
+        "special",
+        false,
+        "Special character"
+    );
+
+    updateRequirement(
+        "unique",
+        false,
+        "Character variety"
+    );
+}
